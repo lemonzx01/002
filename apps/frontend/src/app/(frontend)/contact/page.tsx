@@ -1,235 +1,163 @@
-/**
- * ============================================================
- * Contact Page - หน้าติดต่อเรา (Client Component)
- * ============================================================
- *
- * วัตถุประสงค์:
- *   - แสดงฟอร์มติดต่อเรา
- *   - แสดงข้อมูลการติดต่อ (ที่อยู่, โทรศัพท์, อีเมล, LINE)
- *   - รับข้อความจากผู้ใช้
- *
- * Route:
- *   - /contact - หน้าติดต่อเรา
- *
- * Features:
- *   - Form ส่งข้อความ (ชื่อ, อีเมล, โทร, ข้อความ)
- *   - Success state เมื่อส่งสำเร็จ
- *   - ข้อมูลติดต่อจาก CONTACT_INFO
- *
- * ============================================================
- */
-
 'use client'
 
-// ============================================================
-// การนำเข้า Dependencies
-// ============================================================
-
-/** React hooks สำหรับจัดการ state */
 import { useState } from 'react'
+import { Button } from '@/components/ui/Button'
+import { Input } from '@/components/ui/Input'
 
-/** i18next hook สำหรับ localization */
-import { useTranslation } from 'react-i18next'
-
-/** Lucide icons สำหรับ UI */
-import { MapPin, Phone, Mail, MessageCircle, Clock } from 'lucide-react'
-
-/** UI Components */
-import Button from '@/components/ui/Button'
-import Input from '@/components/ui/Input'
-
-/** ข้อมูลติดต่อจาก constants */
-const CONTACT_INFO = {
-  address: 'Chiang Rai, Thailand',
-  phone: '+66 81 234 5678',
-  email: 'admin@gotjourneythailand.com',
-  line: '@gotjourneythailand',
-  workingHours: '09:00 - 18:00',
-}
-
-
-// ============================================================
-// Main Component
-// ============================================================
-
-/**
- * หน้าติดต่อเรา
- *
- * @description
- *   แสดงฟอร์มติดต่อและข้อมูลการติดต่อ
- *   2 columns: ฟอร์ม (ซ้าย) + ข้อมูลติดต่อ (ขวา)
- *
- * @returns {JSX.Element} Contact page UI
- */
 export default function ContactPage() {
-  // ----------------------------------------------------------
-  // Hooks
-  // ----------------------------------------------------------
-  /** Hook สำหรับ translation */
-  const { t } = useTranslation()
-
-  // ----------------------------------------------------------
-  // State
-  // ----------------------------------------------------------
-  /** State สำหรับข้อมูลฟอร์ม */
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
+    subject: '',
     message: '',
+    type: 'general'
   })
+  const [loading, setLoading] = useState(false)
+  const [success, setSuccess] = useState(false)
+  const [error, setError] = useState('')
 
-  /** State สำหรับสถานะการส่ง */
-  const [submitted, setSubmitted] = useState(false)
-
-  // ----------------------------------------------------------
-  // Event Handlers
-  // ----------------------------------------------------------
-  /**
-   * จัดการการ submit ฟอร์ม
-   */
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // ใน Production จะส่งไป API
-    setSubmitted(true)
+    setLoading(true)
+    setError('')
+    setSuccess(false)
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      })
+
+      const data = await res.json()
+
+      if (data.success) {
+        setSuccess(true)
+        setFormData({ name: '', email: '', phone: '', subject: '', message: '', type: 'general' })
+      } else {
+        setError(data.error || 'Something went wrong')
+      }
+    } catch (err) {
+      setError('Failed to submit form')
+    } finally {
+      setLoading(false)
+    }
   }
 
-  // ----------------------------------------------------------
-  // Render Component
-  // ----------------------------------------------------------
   return (
-    <div className="min-h-screen pt-24 pb-12">
-      {/* ============================================================
-          Header Section - Gradient Background
-          ============================================================ */}
-      <div className="bg-gradient-to-br from-indigo-600 to-purple-700 py-16">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-black text-white mb-4">
-            {t('contact.title')}
-          </h1>
-          <p className="text-xl text-white/80">{t('contact.subtitle')}</p>
-        </div>
-      </div>
+    <div className="min-h-screen bg-gray-50 py-12">
+      <div className="max-w-2xl mx-auto px-4">
+        <div className="bg-white rounded-lg shadow-lg p-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">ติดต่อเรา</h1>
+          <p className="text-gray-600 mb-8">มีคำถามหรือต้องการความช่วยเหลือ? ติดต่อเราได้เลย</p>
 
-      {/* ============================================================
-          Main Content - 2 Columns
-          ============================================================ */}
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 -mt-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* ============================================================
-              คอลัมน์ซ้าย - Contact Form
-              ============================================================ */}
-          <div className="bg-white rounded-2xl shadow-xl p-8">
-            {/* Success State - หลังส่งสำเร็จ */}
-            {submitted ? (
-              <div className="text-center py-12">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <MessageCircle className="w-8 h-8 text-green-600" />
-                </div>
-                <h2 className="text-2xl font-bold text-slate-900 mb-2">{t('contact.form.successTitle')}</h2>
-                <p className="text-slate-500">{t('contact.form.successMessage')}</p>
-              </div>
-            ) : (
-              // Form State - ก่อนส่ง
-              <form onSubmit={handleSubmit} className="space-y-6">
-                {/* ชื่อ */}
+          {success && (
+            <div className="bg-green-50 border border-green-200 text-green-800 rounded-lg p-4 mb-6">
+              ✅ ขอบคุณที่ติดต่อเรา! เราจะติดต่อกลับภายใน 24 ชั่วโมง
+            </div>
+          )}
+
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-800 rounded-lg p-4 mb-6">
+              ❌ {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                ประเภทการติดต่อ *
+              </label>
+              <select
+                value={formData.type}
+                onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              >
+                <option value="general">ทั่วไป</option>
+                <option value="booking">เกี่ยวกับการจอง</option>
+                <option value="support">ต้องการความช่วยเหลือ</option>
+                <option value="partnership">ร่วมงานกับเรา</option>
+              </select>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  ชื่อ-นามสกุล *
+                </label>
                 <Input
-                  label={t('contact.form.name')}
+                  type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder={t('contact.form.namePlaceholder')}
+                  placeholder="กรอกชื่อของคุณ"
                   required
                 />
-                {/* อีเมล */}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  อีเมล *
+                </label>
                 <Input
                   type="email"
-                  label={t('contact.form.email')}
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="example@email.com"
+                  placeholder="your@email.com"
                   required
                 />
-                {/* โทรศัพท์ */}
-                <Input
-                  type="tel"
-                  label={t('contact.form.phone')}
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  placeholder="0812345678"
-                />
-                {/* ข้อความ */}
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">
-                    {t('contact.form.message')}
-                  </label>
-                  <textarea
-                    value={formData.message}
-                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    placeholder={t('contact.form.messagePlaceholder')}
-                    rows={5}
-                    required
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
-                </div>
-                {/* ปุ่มส่ง */}
-                <Button type="submit" size="lg" className="w-full">
-                  {t('contact.form.send')}
-                </Button>
-              </form>
-            )}
-          </div>
-
-          {/* ============================================================
-              คอลัมน์ขวา - Contact Info
-              ============================================================ */}
-          <div className="space-y-6">
-            <div className="bg-white rounded-2xl shadow-xl p-8">
-              <h2 className="text-xl font-bold text-slate-900 mb-6">{t('contact.infoTitle')}</h2>
-              <div className="space-y-6">
-                {/* ที่อยู่ */}
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <MapPin className="w-6 h-6 text-indigo-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-slate-900 mb-1">{t('contact.info.address')}</h3>
-                    <p className="text-slate-500">{CONTACT_INFO.address}</p>
-                  </div>
-                </div>
-
-                {/* โทรศัพท์ */}
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Phone className="w-6 h-6 text-indigo-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-slate-900 mb-1">{t('contact.info.phone')}</h3>
-                    <p className="text-slate-500">{CONTACT_INFO.phone}</p>
-                  </div>
-                </div>
-
-                {/* อีเมล */}
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Mail className="w-6 h-6 text-indigo-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-slate-900 mb-1">{t('contact.info.email')}</h3>
-                    <p className="text-slate-500">{CONTACT_INFO.email}</p>
-                  </div>
-                </div>
-
-                {/* เวลาทำการ */}
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Clock className="w-6 h-6 text-indigo-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-slate-900 mb-1">{t('contact.info.hours')}</h3>
-                    <p className="text-slate-500">{CONTACT_INFO.workingHours}</p>
-                  </div>
-                </div>
               </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                เบอร์โทรศัพท์
+              </label>
+              <Input
+                type="tel"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                placeholder="0812345678"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                หัวข้อ *
+              </label>
+              <Input
+                type="text"
+                value={formData.subject}
+                onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                placeholder="หัวข้อที่ต้องการติดต่อ"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                ข้อความ *
+              </label>
+              <textarea
+                value={formData.message}
+                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                placeholder="รายละเอียด..."
+                rows={5}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                required
+              />
+            </div>
+
+            <Button type="submit" disabled={loading} className="w-full">
+              {loading ? 'กำลังส่ง...' : 'ส่งข้อความ'}
+            </Button>
+          </form>
+
+          <div className="mt-8 pt-8 border-t border-gray-200">
+            <h3 className="font-semibold text-gray-900 mb-4">ข้อมูลติดต่อ</h3>
+            <div className="space-y-2 text-gray-600">
+              <p>📧 อีเมล: hello@gotjourneythailand.com</p>
+              <p>📞 โทร: +66 2 123 4567</p>
+              <p>💬 LINE: @gotjourney</p>
             </div>
           </div>
         </div>
