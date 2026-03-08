@@ -1,0 +1,98 @@
+{
+  "common": {
+    "home": "Home",
+    "about": "About",
+    "contact": "Contact",
+    "login": "Login",
+    "logout": "Logout",
+    "register": "Register",
+    "search": "Search",
+    "booking": "Booking",
+    "checkout": "Checkout",
+    "profile": "Profile",
+    "settings": "Settings",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "close": "Close",
+    "readMore": "Read more",
+    "seeAll": "See all"
+  },
+  "home": {
+    "title": "Premium Car Rental with Hotel Packages",
+    "subtitle": "Book luxury cars with exclusive villa packages. Experience luxury travel in Chiang Rai, Thailand.",
+    "cta": "Book Now",
+    "cta2": "Rent a Car"
+  },
+  "hotels": {
+    "title": "Hotels & Packages",
+    "description": "Find the perfect hotel for your stay",
+    "filter": "Filter",
+    "sort": "Sort",
+    "price": "Price",
+    "rating": "Rating",
+    "guests": "Guests",
+    "nights": "nights",
+    "perNight": "per night",
+    "bookNow": "Book Now",
+    "viewDetails": "View Details"
+  },
+  "cars": {
+    "title": "Car Rental",
+    "description": "Premium cars for your journey",
+    "selectDate": "Select Date",
+    "selectDriver": "Driver Options",
+    "withDriver": "With Driver",
+    "selfDrive": "Self Drive",
+    "perDay": "per day",
+    "bookNow": "Book Now"
+  },
+  "booking": {
+    "title": "Booking",
+    "checkIn": "Check-in",
+    "checkOut": "Check-out",
+    "guests": "Guests",
+    "total": "Total",
+    "confirm": "Confirm Booking",
+    "success": "Booking Confirmed!",
+    "code": "Booking Code"
+  },
+  "payment": {
+    "title": "Payment",
+    "method": "Payment Method",
+    "creditCard": "Credit Card",
+    "promptpay": "PromptPay",
+    "payNow": "Pay Now",
+    "success": "Payment Successful!",
+    "failed": "Payment Failed"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Password",
+    "name": "Name",
+    "phone": "Phone",
+    "loginBtn": "Login",
+    "registerBtn": "Register",
+    "forgotPassword": "Forgot Password?",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?"
+  },
+  "errors": {
+    "required": "This field is required",
+    "invalidEmail": "Invalid email address",
+    "invalidPhone": "Invalid phone number",
+    "minLength": "Minimum {min} characters",
+    "maxLength": "Maximum {max} characters",
+    "serverError": "Server error. Please try again."
+  }
+}

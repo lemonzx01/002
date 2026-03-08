@@ -1,0 +1,576 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Got Journey Thailand API",
+    "description": "Travel Booking Platform API - Hotels, Cars, and Package Bookings",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Got Journey Thailand",
+      "email": "support@gotjourneythailand.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3001",
+      "description": "Development Server"
+    },
+    {
+      "url": "https://api.gotjourneythailand.com",
+      "description": "Production Server"
+    }
+  ],
+  "tags": [
+    { "name": "Hotels", "description": "Hotel management endpoints" },
+    { "name": "Cars", "description": "Car rental endpoints" },
+    { "name": "Bookings", "description": "Booking management endpoints" },
+    { "name": "Payments", "description": "Payment processing endpoints" },
+    { "name": "Reviews", "description": "Review and rating endpoints" },
+    { "name": "Wishlist", "description": "Wishlist endpoints" },
+    { "name": "Search", "description": "Search and filter endpoints" },
+    { "name": "Auth", "description": "Authentication endpoints" },
+    { "name": "Admin", "description": "Admin endpoints" }
+  ],
+  "paths": {
+    "/api/hotels": {
+      "get": {
+        "tags": ["Hotels"],
+        "summary": "Get all hotels",
+        "parameters": [
+          { "name": "active", "in": "query", "schema": { "type": "boolean" } },
+          { "name": "lang", "in": "query", "schema": { "type": "string", "enum": ["th", "en"] } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "hotels": { "type": "array", "items": { "$ref": "#/components/schemas/Hotel" } },
+                    "total": { "type": "integer" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Hotels"],
+        "summary": "Create a new hotel (Admin only)",
+        "security": [{ "AdminAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/HotelInput" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Hotel created" },
+          "400": { "description": "Validation error" },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/api/hotels/{id}": {
+      "get": {
+        "tags": ["Hotels"],
+        "summary": "Get hotel by ID",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "name": "lang", "in": "query", "schema": { "type": "string", "enum": ["th", "en"] } }
+        ],
+        "responses": {
+          "200": { "description": "Successful response" },
+          "404": { "description": "Hotel not found" }
+        }
+      },
+      "put": {
+        "tags": ["Hotels"],
+        "summary": "Update hotel (Admin only)",
+        "security": [{ "AdminAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/HotelInput" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Hotel updated" },
+          "404": { "description": "Hotel not found" }
+        }
+      },
+      "delete": {
+        "tags": ["Hotels"],
+        "summary": "Delete hotel (Admin only)",
+        "security": [{ "AdminAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Hotel deleted" },
+          "404": { "description": "Hotel not found" }
+        }
+      }
+    },
+    "/api/cars": {
+      "get": {
+        "tags": ["Cars"],
+        "summary": "Get all cars",
+        "parameters": [
+          { "name": "active", "in": "query", "schema": { "type": "boolean" } },
+          { "name": "lang", "in": "query", "schema": { "type": "string", "enum": ["th", "en"] } }
+        ],
+        "responses": {
+          "200": { "description": "Successful response" }
+        }
+      },
+      "post": {
+        "tags": ["Cars"],
+        "summary": "Create a new car (Admin only)",
+        "security": [{ "AdminAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CarInput" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Car created" }
+        }
+      }
+    },
+    "/api/cars/{id}": {
+      "get": {
+        "tags": ["Cars"],
+        "summary": "Get car by ID",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Successful response" },
+          "404": { "description": "Car not found" }
+        }
+      },
+      "put": {
+        "tags": ["Cars"],
+        "summary": "Update car (Admin only)",
+        "security": [{ "AdminAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Car updated" }
+        }
+      },
+      "delete": {
+        "tags": ["Cars"],
+        "summary": "Delete car (Admin only)",
+        "security": [{ "AdminAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Car deleted" }
+        }
+      }
+    },
+    "/api/bookings": {
+      "get": {
+        "tags": ["Bookings"],
+        "summary": "Get all bookings",
+        "parameters": [
+          { "name": "status", "in": "query", "schema": { "type": "string" } },
+          { "name": "type", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Successful response" }
+        }
+      },
+      "post": {
+        "tags": ["Bookings"],
+        "summary": "Create a new booking",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/BookingInput" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Booking created" }
+        }
+      }
+    },
+    "/api/bookings/{code}": {
+      "get": {
+        "tags": ["Bookings"],
+        "summary": "Get booking by code",
+        "parameters": [
+          { "name": "code", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Successful response" },
+          "404": { "description": "Booking not found" }
+        }
+      },
+      "put": {
+        "tags": ["Bookings"],
+        "summary": "Update booking",
+        "parameters": [
+          { "name": "code", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Booking updated" }
+        }
+      }
+    },
+    "/api/checkout": {
+      "post": {
+        "tags": ["Payments"],
+        "summary": "Create Stripe checkout session",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["booking_code"],
+                "properties": {
+                  "booking_code": { "type": "string" },
+                  "booking_id": { "type": "string" },
+                  "currency": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Checkout session created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": { "type": "string" },
+                    "session_id": { "type": "string" },
+                    "booking_code": { "type": "string" },
+                    "amount": { "type": "number" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/payments": {
+      "get": {
+        "tags": ["Payments"],
+        "summary": "Get all payments (Admin only)",
+        "security": [{ "AdminAuth": [] }],
+        "responses": {
+          "200": { "description": "Successful response" }
+        }
+      }
+    },
+    "/api/payments/stats": {
+      "get": {
+        "tags": ["Payments"],
+        "summary": "Get payment statistics (Admin only)",
+        "security": [{ "AdminAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Statistics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "stats": {
+                      "type": "object",
+                      "properties": {
+                        "payments": { "type": "object" },
+                        "bookings": { "type": "object" },
+                        "revenue": { "type": "object" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/reviews": {
+      "get": {
+        "tags": ["Reviews"],
+        "summary": "Get reviews",
+        "parameters": [
+          { "name": "item_type", "in": "query", "schema": { "type": "string", "enum": ["hotel", "car"] } },
+          { "name": "item_id", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Successful response" }
+        }
+      },
+      "post": {
+        "tags": ["Reviews"],
+        "summary": "Create a review (requires auth)",
+        "security": [{ "UserAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ReviewInput" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Review created" }
+        }
+      }
+    },
+    "/api/wishlist": {
+      "get": {
+        "tags": ["Wishlist"],
+        "summary": "Get user's wishlist (requires auth)",
+        "security": [{ "UserAuth": [] }],
+        "responses": {
+          "200": { "description": "Successful response" }
+        }
+      },
+      "post": {
+        "tags": ["Wishlist"],
+        "summary": "Add to wishlist (requires auth)",
+        "security": [{ "UserAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/WishlistInput" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Added to wishlist" }
+        }
+      },
+      "delete": {
+        "tags": ["Wishlist"],
+        "summary": "Remove from wishlist (requires auth)",
+        "security": [{ "UserAuth": [] }],
+        "parameters": [
+          { "name": "item_type", "in": "query", "required": true, "schema": { "type": "string" } },
+          { "name": "item_id", "in": "query", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Removed from wishlist" }
+        }
+      }
+    },
+    "/api/search": {
+      "get": {
+        "tags": ["Search"],
+        "summary": "Search hotels and cars",
+        "parameters": [
+          { "name": "type", "in": "query", "schema": { "type": "string", "enum": ["hotel", "car", "all"] } },
+          { "name": "query", "in": "query", "schema": { "type": "string" } },
+          { "name": "min_price", "in": "query", "schema": { "type": "number" } },
+          { "name": "max_price", "in": "query", "schema": { "type": "number" } },
+          { "name": "location", "in": "query", "schema": { "type": "string" } },
+          { "name": "rating", "in": "query", "schema": { "type": "number" } },
+          { "name": "guests", "in": "query", "schema": { "type": "number" } },
+          { "name": "sort_by", "in": "query", "schema": { "type": "string", "enum": ["price_asc", "price_desc", "rating", "newest"] } },
+          { "name": "lang", "in": "query", "schema": { "type": "string", "enum": ["th", "en"] } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Search results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "results": { "type": "array" },
+                    "hotels": { "type": "integer" },
+                    "cars": { "type": "integer" },
+                    "total": { "type": "integer" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "User login",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Login successful" },
+          "401": { "description": "Invalid credentials" }
+        }
+      }
+    },
+    "/api/admin/login": {
+      "post": {
+        "tags": ["Admin"],
+        "summary": "Admin login",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Login successful" },
+          "401": { "description": "Invalid credentials" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "AdminAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "admin_token"
+      },
+      "UserAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "auth_token"
+      }
+    },
+    "schemas": {
+      "Hotel": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name_th": { "type": "string" },
+          "name_en": { "type": "string" },
+          "description_th": { "type": "string" },
+          "description_en": { "type": "string" },
+          "location_th": { "type": "string" },
+          "location_en": { "type": "string" },
+          "star_rating": { "type": "integer" },
+          "base_price_per_night": { "type": "number" },
+          "max_guests": { "type": "integer" },
+          "images": { "type": "array", "items": { "type": "string" } },
+          "is_active": { "type": "boolean" }
+        }
+      },
+      "HotelInput": {
+        "type": "object",
+        "required": ["name_th", "name_en"],
+        "properties": {
+          "name_th": { "type": "string" },
+          "name_en": { "type": "string" },
+          "description_th": { "type": "string" },
+          "description_en": { "type": "string" },
+          "location_th": { "type": "string" },
+          "location_en": { "type": "string" },
+          "star_rating": { "type": "integer", "minimum": 1, "maximum": 5 },
+          "base_price_per_night": { "type": "number" },
+          "max_guests": { "type": "integer" },
+          "room_type_th": { "type": "string" },
+          "room_type_en": { "type": "string" },
+          "amenities_th": { "type": "array", "items": { "type": "string" } },
+          "amenities_en": { "type": "array", "items": { "type": "string" } },
+          "images": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "CarInput": {
+        "type": "object",
+        "required": ["name_th", "name_en"],
+        "properties": {
+          "name_th": { "type": "string" },
+          "name_en": { "type": "string" },
+          "description_th": { "type": "string" },
+          "description_en": { "type": "string" },
+          "car_type_th": { "type": "string" },
+          "car_type_en": { "type": "string" },
+          "max_passengers": { "type": "integer" },
+          "base_price_per_day": { "type": "number" },
+          "includes_th": { "type": "array", "items": { "type": "string" } },
+          "includes_en": { "type": "array", "items": { "type": "string" } },
+          "images": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "BookingInput": {
+        "type": "object",
+        "required": ["booking_type", "check_in_date", "check_out_date", "customer_name", "customer_email", "customer_phone"],
+        "properties": {
+          "booking_type": { "type": "string", "enum": ["HOTEL", "CAR", "COMBO"] },
+          "hotel_id": { "type": "string" },
+          "car_id": { "type": "string" },
+          "check_in_date": { "type": "string", "format": "date" },
+          "check_out_date": { "type": "string", "format": "date" },
+          "number_of_guests": { "type": "integer" },
+          "customer_name": { "type": "string" },
+          "customer_email": { "type": "string", "format": "email" },
+          "customer_phone": { "type": "string" },
+          "customer_line": { "type": "string" },
+          "special_requests": { "type": "string" }
+        }
+      },
+      "ReviewInput": {
+        "type": "object",
+        "required": ["item_type", "item_id", "rating"],
+        "properties": {
+          "item_type": { "type": "string", "enum": ["hotel", "car"] },
+          "item_id": { "type": "string" },
+          "rating": { "type": "integer", "minimum": 1, "maximum": 5 },
+          "comment_th": { "type": "string" },
+          "comment_en": { "type": "string" }
+        }
+      },
+      "WishlistInput": {
+        "type": "object",
+        "required": ["item_type", "item_id"],
+        "properties": {
+          "item_type": { "type": "string", "enum": ["hotel", "car"] },
+          "item_id": { "type": "string" }
+        }
+      }
+    }
+  }
+}
